@@ -63,6 +63,10 @@ class DealDetailsLoaderAdapter: DealDetailsViewLoader {
             self.tasksLoader.load(dealID: dealID) { tasksResult in
                 self.contactsLoader.load(dealID: dealID) { contactsResult in
                     self.filesLoader.load(dealID: dealID) { filesResult in
+                        if case let .failure(error) = filesResult {
+                            return completion(.failure(error))
+                        }
+                        
                         self.notesLoader.load(dealID: dealID) { notesResult in
                             completion(.success(DealDetailsModel(dealDetails: try! detailsResult.get(),
                                                                  tasks: try! tasksResult.get(),
@@ -97,11 +101,33 @@ final class DealDetailsLoaderAdapterTests: XCTestCase {
         
         XCTAssertEqual(try result?.get(), .mock)
     }
+    
+    func test_load_failsWithFilesLoaderError() {
+        let loader = LoaderStub()
+        loader.filesLoaderError = NSError(domain: "any", code: 0)
+        
+        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
+                                           tasksLoader: loader,
+                                           contactsLoader: loader,
+                                           filesLoader: loader,
+                                           notesLoader: loader)
+        
+        let exp = expectation(description: "Wait for completion")
+        var result: DealDetailsViewLoader.LoaderResult?
+        sut.load(dealID: "1") {
+            result = $0
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.1)
+        
+        XCTAssertEqual(result?.error as? NSError, loader.filesLoaderError)
+    }
 }
 
 // MARK: - Helpers
 
 private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesLoader, NotesLoader {
+    var filesLoaderError: NSError?
 
     func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void) {
         completion(.success(.mock))
@@ -116,7 +142,11 @@ private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesL
     }
     
     func load(dealID: String, completion: @escaping (FilesResult) -> Void) {
-        completion(.success(.mock))
+        if let error = filesLoaderError {
+            completion(.failure(error))
+        } else {
+            completion(.success(.mock))
+        }
     }
     
     func load(dealID: String, completion: @escaping (NotesResult) -> Void) {
@@ -150,4 +180,15 @@ extension Files {
 
 extension Note {
     static let mock = Note()
+}
+
+private extension Result {
+    var error: Failure? {
+        switch self {
+        case let .failure(error):
+            return error
+        case .success:
+            return nil
+        }
+    }
 }
