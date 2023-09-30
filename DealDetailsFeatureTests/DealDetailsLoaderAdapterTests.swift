@@ -10,28 +10,89 @@ struct DealDetailsModel {
     let notes: [Note]
 }
 
+protocol DealDetailsViewLoader {
+    typealias LoaderResult = Result<DealDetailsModel, Error>
+    
+    func load(dealID: String, completion: @escaping (LoaderResult) -> Void)
+}
+
+protocol DealDetailsLoader {
+    typealias DealDetailsResult = Result<DealDetails, Error>
+    
+    func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void)
+}
+protocol TasksLoader {
+    typealias TasksResult = Result<[Task], Error>
+    
+    func load(dealID: String, completion: @escaping (TasksResult) -> Void)
+}
+protocol ContactsLoader {
+    typealias ContactsResult = Result<[Contact], Error>
+    
+    func load(dealID: String, completion: @escaping (ContactsResult) -> Void)
+}
+protocol FilesLoader {
+    typealias FilesResult = Result<Files, Error>
+    
+    func load(dealID: String, completion: @escaping (FilesResult) -> Void)
+}
+protocol NotesLoader {
+    typealias NotesResult = Result<[Note], Error>
+    
+    func load(dealID: String, completion: @escaping (NotesResult) -> Void)
+}
+
+class DealDetailsLoaderAdapter {
+    let dealDeailsLoader: DealDetailsLoader
+    let tasksLoader: TasksLoader
+    let contactsLoader: ContactsLoader
+    let filesLoader: FilesLoader
+    let notesLoader: NotesLoader
+    
+    init(dealDeailsLoader: DealDetailsLoader, tasksLoader: TasksLoader, contactsLoader: ContactsLoader, filesLoader: FilesLoader, notesLoader: NotesLoader) {
+        self.dealDeailsLoader = dealDeailsLoader
+        self.tasksLoader = tasksLoader
+        self.contactsLoader = contactsLoader
+        self.filesLoader = filesLoader
+        self.notesLoader = notesLoader
+    }
+}
+
 final class DealDetailsLoaderAdapterTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    func test() {
+        let loader = LoaderStub()
+        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader, 
+                                           tasksLoader: loader,
+                                           contactsLoader: loader,
+                                           filesLoader: loader,
+                                           notesLoader: loader)
+        
+        
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    
+    // MARK: - Helpers
+    
+    private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesLoader, NotesLoader {
+        
+        func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void) {
+            
+        }
+        
+        func load(dealID: String, completion: @escaping (TasksResult) -> Void) {
+            
+        }
+        
+        func load(dealID: String, completion: @escaping (ContactsResult) -> Void) {
+            
+        }
+        
+        func load(dealID: String, completion: @escaping (FilesResult) -> Void) {
+            
+        }
+        
+        func load(dealID: String, completion: @escaping (NotesResult) -> Void) {
+            
         }
     }
 
