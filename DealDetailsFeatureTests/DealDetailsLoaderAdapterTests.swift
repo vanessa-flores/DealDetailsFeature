@@ -2,46 +2,6 @@ import XCTest
 
 @testable import DealDetailsFeature
 
-struct DealDetailsModel: Equatable {
-    let dealDetails: DealDetails
-    let tasks: [Task]
-    let contacts: [Contact]
-    let files: Files
-    let notes: [Note]
-}
-
-protocol DealDetailsViewLoader {
-    typealias LoaderResult = Result<DealDetailsModel, Error>
-    
-    func load(dealID: String, completion: @escaping (LoaderResult) -> Void)
-}
-
-protocol DealDetailsLoader {
-    typealias DealDetailsResult = Result<DealDetails, Error>
-    
-    func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void)
-}
-protocol TasksLoader {
-    typealias TasksResult = Result<[Task], Error>
-    
-    func load(dealID: String, completion: @escaping (TasksResult) -> Void)
-}
-protocol ContactsLoader {
-    typealias ContactsResult = Result<[Contact], Error>
-    
-    func load(dealID: String, completion: @escaping (ContactsResult) -> Void)
-}
-protocol FilesLoader {
-    typealias FilesResult = Result<Files, Error>
-    
-    func load(dealID: String, completion: @escaping (FilesResult) -> Void)
-}
-protocol NotesLoader {
-    typealias NotesResult = Result<[Note], Error>
-    
-    func load(dealID: String, completion: @escaping (NotesResult) -> Void)
-}
-
 class DealDetailsLoaderAdapter: DealDetailsViewLoader {
     
     let dealDeailsLoader: DealDetailsLoader
@@ -49,6 +9,7 @@ class DealDetailsLoaderAdapter: DealDetailsViewLoader {
     let contactsLoader: ContactsLoader
     let filesLoader: FilesLoader
     let notesLoader: NotesLoader
+    private let queue = DispatchQueue(label: "DealDetailsLoaderAdapter.queue")
     
     init(dealDeailsLoader: DealDetailsLoader, tasksLoader: TasksLoader, contactsLoader: ContactsLoader, filesLoader: FilesLoader, notesLoader: NotesLoader) {
         self.dealDeailsLoader = dealDeailsLoader
@@ -58,39 +19,102 @@ class DealDetailsLoaderAdapter: DealDetailsViewLoader {
         self.notesLoader = notesLoader
     }
     
-    func load(dealID: String, completion: @escaping (LoaderResult) -> Void) {
-        dealDeailsLoader.load(dealID: dealID) { detailsResult in
-            if case let .failure(error) = detailsResult {
-                return completion(.failure(error))
+    struct PartialResult {
+        var dealDetails: DealDetails? {
+            didSet { checkCompletion() }
+        }
+        
+        var tasks: [Task]? {
+            didSet { checkCompletion() }
+        }
+        
+        var contacts: [Contact]? {
+            didSet { checkCompletion() }
+        }
+        
+        var files: Files? {
+            didSet { checkCompletion() }
+        }
+        
+        var notes: [Note]? {
+            didSet { checkCompletion() }
+        }
+        
+        var error: Error?  {
+            didSet { checkCompletion() }
+        }
+        
+        var completion: ((DealDetailsViewLoader.LoaderResult) -> Void)?
+        
+        private mutating func checkCompletion() {
+            if let error = error {
+                completion?(.failure(error))
+                completion = nil
+            } else if let dealDetails = dealDetails, let tasks = tasks, let contacts = contacts, let files = files, let notes = notes {
+                completion?(.success(DealDetailsModel(dealDetails: dealDetails,
+                                                      tasks: tasks,
+                                                      contacts: contacts,
+                                                      files: files,
+                                                      notes: notes)))
+                completion = nil
             }
-            
-            self.tasksLoader.load(dealID: dealID) { tasksResult in
-                if case let .failure(error) = tasksResult {
-                    return completion(.failure(error))
+        }
+    }
+    
+    func load(dealID: String, completion: @escaping (LoaderResult) -> Void) {
+        var partialResult = PartialResult(completion: completion)
+        
+        dealDeailsLoader.load(dealID: dealID) { detailsResult in
+            self.queue.sync {
+                switch detailsResult {
+                case .success(let value):
+                    partialResult.dealDetails = value
+                case .failure(let error):
+                    partialResult.error = error
                 }
-                
-                self.contactsLoader.load(dealID: dealID) { contactsResult in
-                    if case let .failure(error) = contactsResult {
-                        return completion(.failure(error))
-                    }
-                    
-                    self.filesLoader.load(dealID: dealID) { filesResult in
-                        if case let .failure(error) = filesResult {
-                            return completion(.failure(error))
-                        }
-                        
-                        self.notesLoader.load(dealID: dealID) { notesResult in
-                            if case let .failure(error) = notesResult {
-                                return completion(.failure(error))
-                            }
-                            
-                            completion(.success(DealDetailsModel(dealDetails: try! detailsResult.get(),
-                                                                 tasks: try! tasksResult.get(),
-                                                                 contacts: try! contactsResult.get(),
-                                                                 files: try! filesResult.get(),
-                                                                 notes: try! notesResult.get())))
-                        }
-                    }
+            }
+        }
+        
+        tasksLoader.load(dealID: dealID) { tasksResult in
+            self.queue.sync {
+                switch tasksResult {
+                case .success(let value):
+                    partialResult.tasks = value
+                case .failure(let error):
+                    partialResult.error = error
+                }
+            }
+        }
+        
+        contactsLoader.load(dealID: dealID) { contactsResult in
+            self.queue.sync {
+                switch contactsResult {
+                case .success(let value):
+                    partialResult.contacts = value
+                case .failure(let error):
+                    partialResult.error = error
+                }
+            }
+        }
+        
+        filesLoader.load(dealID: dealID) { filesResult in
+            self.queue.sync {
+                switch filesResult {
+                case .success(let value):
+                    partialResult.files = value
+                case .failure(let error):
+                    partialResult.error = error
+                }
+            }
+        }
+        
+        notesLoader.load(dealID: dealID) { notesResult in
+            self.queue.sync {
+                switch notesResult {
+                case .success(let value):
+                    partialResult.notes = value
+                case .failure(let error):
+                    partialResult.error = error
                 }
             }
         }
@@ -234,42 +258,52 @@ private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesL
     var notesLoaderError: NSError?
 
     func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void) {
-        if let error = detailsLoaderError {
-            completion(.failure(error))
-        } else {
-            completion(.success(.mock))
+        DispatchQueue.global().async {
+            if let error = self.detailsLoaderError {
+                completion(.failure(error))
+            } else {
+                completion(.success(.mock))
+            }
         }
     }
     
     func load(dealID: String, completion: @escaping (TasksResult) -> Void) {
-        if let error = tasksLoaderError {
-            completion(.failure(error))
-        } else {
-            completion(.success([.mock]))
+        DispatchQueue.global().async {
+            if let error = self.tasksLoaderError {
+                completion(.failure(error))
+            } else {
+                completion(.success([.mock]))
+            }
         }
     }
     
     func load(dealID: String, completion: @escaping (ContactsResult) -> Void) {
-        if let error = contactsLoaderError {
-            completion(.failure(error))
-        } else {
-            completion(.success([.mock]))
+        DispatchQueue.global().async {
+            if let error = self.contactsLoaderError {
+                completion(.failure(error))
+            } else {
+                completion(.success([.mock]))
+            }
         }
     }
     
     func load(dealID: String, completion: @escaping (FilesResult) -> Void) {
-        if let error = filesLoaderError {
-            completion(.failure(error))
-        } else {
-            completion(.success(.mock))
+        DispatchQueue.global().async {
+            if let error = self.filesLoaderError {
+                completion(.failure(error))
+            } else {
+                completion(.success(.mock))
+            }
         }
     }
     
     func load(dealID: String, completion: @escaping (NotesResult) -> Void) {
-        if let error = notesLoaderError {
-            completion(.failure(error))
-        } else {
-            completion(.success([.mock]))
+        DispatchQueue.global().async {
+            if let error = self.notesLoaderError {
+                completion(.failure(error))
+            } else {
+                completion(.success([.mock]))
+            }
         }
     }
 }

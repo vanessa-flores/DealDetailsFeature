@@ -20,6 +20,7 @@
 		A3532A912AC879C400ABB174 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3532A902AC879C400ABB174 /* Contact.swift */; };
 		A3532A932AC879D500ABB174 /* Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3532A922AC879D500ABB174 /* Files.swift */; };
 		A3532A952AC879EA00ABB174 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3532A942AC879EA00ABB174 /* Note.swift */; };
+		A3C0ACD52AC8A77A0073342B /* DealDetailsViewLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 		A3532A902AC879C400ABB174 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		A3532A922AC879D500ABB174 /* Files.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Files.swift; sourceTree = "<group>"; };
 		A3532A942AC879EA00ABB174 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DealDetailsViewLoader.swift; path = DealDetailsFeature/Models/DealDetailsViewLoader.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 		A3532A5E2AC86BB600ABB174 /* DealDetailsFeature */ = {
 			isa = PBXGroup;
 			children = (
+				A3C0ACD32AC8A7630073342B /* Loaders */,
 				A3532A8B2AC8795800ABB174 /* Models */,
 				A3532A5F2AC86BB600ABB174 /* DealDetailsFeatureApp.swift */,
 				A3532A612AC86BB600ABB174 /* ContentView.swift */,
@@ -151,6 +154,14 @@
 				A3532A942AC879EA00ABB174 /* Note.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		A3C0ACD32AC8A7630073342B /* Loaders */ = {
+			isa = PBXGroup;
+			children = (
+				A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */,
+			);
+			path = Loaders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -287,6 +298,7 @@
 				A3532A8D2AC8797200ABB174 /* DealDetails.swift in Sources */,
 				A3532A952AC879EA00ABB174 /* Note.swift in Sources */,
 				A3532A912AC879C400ABB174 /* Contact.swift in Sources */,
+				A3C0ACD52AC8A77A0073342B /* DealDetailsViewLoader.swift in Sources */,
 				A3532A622AC86BB600ABB174 /* ContentView.swift in Sources */,
 				A3532A602AC86BB600ABB174 /* DealDetailsFeatureApp.swift in Sources */,
 				A3532A932AC879D500ABB174 /* Files.swift in Sources */,
