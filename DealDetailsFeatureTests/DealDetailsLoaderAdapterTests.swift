@@ -60,14 +60,30 @@ class DealDetailsLoaderAdapter: DealDetailsViewLoader {
     
     func load(dealID: String, completion: @escaping (LoaderResult) -> Void) {
         dealDeailsLoader.load(dealID: dealID) { detailsResult in
+            if case let .failure(error) = detailsResult {
+                return completion(.failure(error))
+            }
+            
             self.tasksLoader.load(dealID: dealID) { tasksResult in
+                if case let .failure(error) = tasksResult {
+                    return completion(.failure(error))
+                }
+                
                 self.contactsLoader.load(dealID: dealID) { contactsResult in
+                    if case let .failure(error) = contactsResult {
+                        return completion(.failure(error))
+                    }
+                    
                     self.filesLoader.load(dealID: dealID) { filesResult in
                         if case let .failure(error) = filesResult {
                             return completion(.failure(error))
                         }
                         
                         self.notesLoader.load(dealID: dealID) { notesResult in
+                            if case let .failure(error) = notesResult {
+                                return completion(.failure(error))
+                            }
+                            
                             completion(.success(DealDetailsModel(dealDetails: try! detailsResult.get(),
                                                                  tasks: try! tasksResult.get(),
                                                                  contacts: try! contactsResult.get(),
@@ -102,6 +118,69 @@ final class DealDetailsLoaderAdapterTests: XCTestCase {
         XCTAssertEqual(try result?.get(), .mock)
     }
     
+    func test_load_failsWithDetailsLoaderError() {
+        let loader = LoaderStub()
+        loader.detailsLoaderError = NSError(domain: "any", code: 0)
+        
+        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
+                                           tasksLoader: loader,
+                                           contactsLoader: loader,
+                                           filesLoader: loader,
+                                           notesLoader: loader)
+        
+        let exp = expectation(description: "Wait for completion")
+        var result: DealDetailsViewLoader.LoaderResult?
+        sut.load(dealID: "1") {
+            result = $0
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.1)
+        
+        XCTAssertEqual(result?.error as? NSError, loader.detailsLoaderError)
+    }
+    
+    func test_load_failsWithTasksLoaderError() {
+        let loader = LoaderStub()
+        loader.tasksLoaderError = NSError(domain: "any", code: 0)
+        
+        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
+                                           tasksLoader: loader,
+                                           contactsLoader: loader,
+                                           filesLoader: loader,
+                                           notesLoader: loader)
+        
+        let exp = expectation(description: "Wait for completion")
+        var result: DealDetailsViewLoader.LoaderResult?
+        sut.load(dealID: "1") {
+            result = $0
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.1)
+        
+        XCTAssertEqual(result?.error as? NSError, loader.tasksLoaderError)
+    }
+    
+    func test_load_failsWithContactsLoaderError() {
+        let loader = LoaderStub()
+        loader.contactsLoaderError = NSError(domain: "any", code: 0)
+        
+        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
+                                           tasksLoader: loader,
+                                           contactsLoader: loader,
+                                           filesLoader: loader,
+                                           notesLoader: loader)
+        
+        let exp = expectation(description: "Wait for completion")
+        var result: DealDetailsViewLoader.LoaderResult?
+        sut.load(dealID: "1") {
+            result = $0
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.1)
+        
+        XCTAssertEqual(result?.error as? NSError, loader.contactsLoaderError)
+    }
+    
     func test_load_failsWithFilesLoaderError() {
         let loader = LoaderStub()
         loader.filesLoaderError = NSError(domain: "any", code: 0)
@@ -122,23 +201,60 @@ final class DealDetailsLoaderAdapterTests: XCTestCase {
         
         XCTAssertEqual(result?.error as? NSError, loader.filesLoaderError)
     }
+    
+    func test_load_failsWithNotesLoaderError() {
+        let loader = LoaderStub()
+        loader.notesLoaderError = NSError(domain: "any", code: 0)
+        
+        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
+                                           tasksLoader: loader,
+                                           contactsLoader: loader,
+                                           filesLoader: loader,
+                                           notesLoader: loader)
+        
+        let exp = expectation(description: "Wait for completion")
+        var result: DealDetailsViewLoader.LoaderResult?
+        sut.load(dealID: "1") {
+            result = $0
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.1)
+        
+        XCTAssertEqual(result?.error as? NSError, loader.notesLoaderError)
+    }
 }
 
 // MARK: - Helpers
 
 private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesLoader, NotesLoader {
+    var detailsLoaderError: NSError?
+    var tasksLoaderError: NSError?
+    var contactsLoaderError: NSError?
     var filesLoaderError: NSError?
+    var notesLoaderError: NSError?
 
     func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void) {
-        completion(.success(.mock))
+        if let error = detailsLoaderError {
+            completion(.failure(error))
+        } else {
+            completion(.success(.mock))
+        }
     }
     
     func load(dealID: String, completion: @escaping (TasksResult) -> Void) {
-        completion(.success([.mock]))
+        if let error = tasksLoaderError {
+            completion(.failure(error))
+        } else {
+            completion(.success([.mock]))
+        }
     }
     
     func load(dealID: String, completion: @escaping (ContactsResult) -> Void) {
-        completion(.success([.mock]))
+        if let error = contactsLoaderError {
+            completion(.failure(error))
+        } else {
+            completion(.success([.mock]))
+        }
     }
     
     func load(dealID: String, completion: @escaping (FilesResult) -> Void) {
@@ -150,7 +266,11 @@ private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesL
     }
     
     func load(dealID: String, completion: @escaping (NotesResult) -> Void) {
-        completion(.success([.mock]))
+        if let error = notesLoaderError {
+            completion(.failure(error))
+        } else {
+            completion(.success([.mock]))
+        }
     }
 }
 
