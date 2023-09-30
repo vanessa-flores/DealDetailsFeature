@@ -1,3 +1,3 @@
 import Foundation
 
-struct Files {}
+struct Files: Equatable {}

@@ -1,3 +1,3 @@
 import Foundation
 
-struct Contact {}
+struct Contact: Equatable {}

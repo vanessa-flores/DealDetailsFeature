@@ -1,3 +1,3 @@
 import Foundation
 
-struct Note {}
+struct Note: Equatable {}

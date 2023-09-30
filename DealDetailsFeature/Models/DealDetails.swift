@@ -1,3 +1,3 @@
 import Foundation
 
-struct DealDetails {}
+struct DealDetails: Equatable {}

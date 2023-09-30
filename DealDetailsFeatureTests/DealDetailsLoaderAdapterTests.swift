@@ -2,7 +2,7 @@ import XCTest
 
 @testable import DealDetailsFeature
 
-struct DealDetailsModel {
+struct DealDetailsModel: Equatable {
     let dealDetails: DealDetails
     let tasks: [Task]
     let contacts: [Contact]
@@ -42,7 +42,8 @@ protocol NotesLoader {
     func load(dealID: String, completion: @escaping (NotesResult) -> Void)
 }
 
-class DealDetailsLoaderAdapter {
+class DealDetailsLoaderAdapter: DealDetailsViewLoader {
+    
     let dealDeailsLoader: DealDetailsLoader
     let tasksLoader: TasksLoader
     let contactsLoader: ContactsLoader
@@ -56,11 +57,29 @@ class DealDetailsLoaderAdapter {
         self.filesLoader = filesLoader
         self.notesLoader = notesLoader
     }
+    
+    func load(dealID: String, completion: @escaping (LoaderResult) -> Void) {
+        dealDeailsLoader.load(dealID: dealID) { detailsResult in
+            self.tasksLoader.load(dealID: dealID) { tasksResult in
+                self.contactsLoader.load(dealID: dealID) { contactsResult in
+                    self.filesLoader.load(dealID: dealID) { filesResult in
+                        self.notesLoader.load(dealID: dealID) { notesResult in
+                            completion(.success(DealDetailsModel(dealDetails: try! detailsResult.get(),
+                                                                 tasks: try! tasksResult.get(),
+                                                                 contacts: try! contactsResult.get(),
+                                                                 files: try! filesResult.get(),
+                                                                 notes: try! notesResult.get())))
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 final class DealDetailsLoaderAdapterTests: XCTestCase {
 
-    func test() {
+    func test_load_producesCombinedSuccessfulLoaderResults() {
         let loader = LoaderStub()
         let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader, 
                                            tasksLoader: loader,
@@ -68,32 +87,67 @@ final class DealDetailsLoaderAdapterTests: XCTestCase {
                                            filesLoader: loader,
                                            notesLoader: loader)
         
+        let exp = expectation(description: "Wait for completion")
+        var result: DealDetailsViewLoader.LoaderResult?
+        sut.load(dealID: "1") {
+            result = $0
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.1)
         
+        XCTAssertEqual(try result?.get(), .mock)
     }
-    
-    // MARK: - Helpers
-    
-    private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesLoader, NotesLoader {
-        
-        func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void) {
-            
-        }
-        
-        func load(dealID: String, completion: @escaping (TasksResult) -> Void) {
-            
-        }
-        
-        func load(dealID: String, completion: @escaping (ContactsResult) -> Void) {
-            
-        }
-        
-        func load(dealID: String, completion: @escaping (FilesResult) -> Void) {
-            
-        }
-        
-        func load(dealID: String, completion: @escaping (NotesResult) -> Void) {
-            
-        }
-    }
+}
 
+// MARK: - Helpers
+
+private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesLoader, NotesLoader {
+
+    func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void) {
+        completion(.success(.mock))
+    }
+    
+    func load(dealID: String, completion: @escaping (TasksResult) -> Void) {
+        completion(.success([.mock]))
+    }
+    
+    func load(dealID: String, completion: @escaping (ContactsResult) -> Void) {
+        completion(.success([.mock]))
+    }
+    
+    func load(dealID: String, completion: @escaping (FilesResult) -> Void) {
+        completion(.success(.mock))
+    }
+    
+    func load(dealID: String, completion: @escaping (NotesResult) -> Void) {
+        completion(.success([.mock]))
+    }
+}
+
+extension DealDetailsModel {
+    static let mock = DealDetailsModel(dealDetails: .mock,
+                                       tasks: [.mock],
+                                       contacts: [.mock],
+                                       files: .mock,
+                                       notes: [.mock])
+}
+
+extension DealDetails {
+    static let mock = DealDetails()
+}
+
+extension Task {
+    static let mock = Task()
+}
+
+extension Contact {
+    static let mock = Contact()
+}
+
+extension Files {
+    static let mock = Files()
+}
+
+extension Note {
+    static let mock = Note()
 }

@@ -1,3 +1,3 @@
 import Foundation
 
-struct Task {}
+struct Task: Equatable {}
