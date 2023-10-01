@@ -4,156 +4,129 @@ import XCTest
 
 final class DealDetailsLoaderAdapterTests: XCTestCase {
 
-    func test_load_producesCombinedSuccessfulLoaderResults() {
-        let loader = LoaderStub()
-        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader, 
-                                           tasksLoader: loader,
-                                           contactsLoader: loader,
-                                           filesLoader: loader,
-                                           notesLoader: loader)
+    func test_Load_producesCombinedSuccessfulLoaderResults() async {
+        let detailsLoaderStub = DetailsLoaderStub(result: .success(.mock))
+        let tasksLoaderStub = TasksLoaderStub(result: .success([.mock]))
+        let contactsLoaderStub = ContactsLoaderStub(result: .success([.mock]))
+        let filesLoaderStub = FilesLoaderStub(result: .success(.mock))
+        let notesLoaderStub = NotesLoaderStub(result: .success([.mock]))
         
-        let exp = expectation(description: "Wait for completion")
-        var result: DealDetailsViewLoader.LoaderResult?
-        sut.load(dealID: "1") {
-            result = $0
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 0.1)
-        
-        XCTAssertEqual(try result?.get(), .mock)
-    }
-    
-    func test_load_failsWithDetailsLoaderError() {
-        let loader = LoaderStub()
-        loader.detailsLoaderError = NSError(domain: "any", code: 0)
-        
-        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
-                                           tasksLoader: loader,
-                                           contactsLoader: loader,
-                                           filesLoader: loader,
-                                           notesLoader: loader)
-        
-        let exp = expectation(description: "Wait for completion")
-        var result: DealDetailsViewLoader.LoaderResult?
-        sut.load(dealID: "1") {
-            result = $0
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 0.1)
-        
-        XCTAssertEqual(result?.error as? NSError, loader.detailsLoaderError)
-    }
-    
-    func test_load_failsWithTasksLoaderError() {
-        let loader = LoaderStub()
-        loader.tasksLoaderError = NSError(domain: "any", code: 0)
-        
-        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
-                                           tasksLoader: loader,
-                                           contactsLoader: loader,
-                                           filesLoader: loader,
-                                           notesLoader: loader)
-        
-        let exp = expectation(description: "Wait for completion")
-        var result: DealDetailsViewLoader.LoaderResult?
-        sut.load(dealID: "1") {
-            result = $0
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 0.1)
-        
-        XCTAssertEqual(result?.error as? NSError, loader.tasksLoaderError)
-    }
-    
-    func test_load_failsWithContactsLoaderError() {
-        let loader = LoaderStub()
-        loader.contactsLoaderError = NSError(domain: "any", code: 0)
-        
-        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
-                                           tasksLoader: loader,
-                                           contactsLoader: loader,
-                                           filesLoader: loader,
-                                           notesLoader: loader)
-        
-        let exp = expectation(description: "Wait for completion")
-        var result: DealDetailsViewLoader.LoaderResult?
-        sut.load(dealID: "1") {
-            result = $0
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 0.1)
-        
-        XCTAssertEqual(result?.error as? NSError, loader.contactsLoaderError)
-    }
-    
-    func test_load_failsWithFilesLoaderError() {
-        let loader = LoaderStub()
-        loader.filesLoaderError = NSError(domain: "any", code: 0)
-        
-        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
-                                           tasksLoader: loader,
-                                           contactsLoader: loader,
-                                           filesLoader: loader,
-                                           notesLoader: loader)
-        
-        let exp = expectation(description: "Wait for completion")
-        var result: DealDetailsViewLoader.LoaderResult?
-        sut.load(dealID: "1") {
-            result = $0
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 0.1)
-        
-        XCTAssertEqual(result?.error as? NSError, loader.filesLoaderError)
-    }
-    
-    func test_load_failsWithNotesLoaderError() {
-        let loader = LoaderStub()
-        loader.notesLoaderError = NSError(domain: "any", code: 0)
-        
-        let sut = DealDetailsLoaderAdapter(dealDeailsLoader: loader,
-                                           tasksLoader: loader,
-                                           contactsLoader: loader,
-                                           filesLoader: loader,
-                                           notesLoader: loader)
-        
-        let exp = expectation(description: "Wait for completion")
-        var result: DealDetailsViewLoader.LoaderResult?
-        sut.load(dealID: "1") {
-            result = $0
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 0.1)
-        
-        XCTAssertEqual(result?.error as? NSError, loader.notesLoaderError)
-    }
-    
-    // MARK: - Async Tests
-    
-    func test_asyncLoad_producesCombinedSuccessfulLoaderResults() async {
-        let detailsLoaderStub = AsyncDetailsLoaderStub(result: .success(.mock))
-        let error = NSError(domain: "any", code: 0)
-        let filesLoaderStub = AsyncFilesLoaderStub(result: .success(.mock))
-        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub, filesLoader: filesLoaderStub)
+        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub,
+                          tasksLoader: tasksLoaderStub,
+                          contactsLoader: contactsLoaderStub,
+                          filesLoader: filesLoaderStub,
+                          notesLoader: notesLoaderStub)
         
         let result = await sut.load(dealID: "1")
         
-        switch result {
-        case .success(let value):
-            XCTAssertEqual(value, .mock)
-        case .failure(let error):
-            XCTFail("Expected success but received \(error)")
-        }
+        XCTAssertEqual(result, .mockSuccess)
+    }
+    
+    func test_load_failsWithDetailsLoaderError() async {
+        let detailsLoaderStub = DetailsLoaderStub(result: .failure(loaderError()))
+        let tasksLoaderStub = TasksLoaderStub(result: .success([.mock]))
+        let contactsLoaderStub = ContactsLoaderStub(result: .success([.mock]))
+        let filesLoaderStub = FilesLoaderStub(result: .success(.mock))
+        let notesLoaderStub = NotesLoaderStub(result: .success([.mock]))
+        
+        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub,
+                          tasksLoader: tasksLoaderStub,
+                          contactsLoader: contactsLoaderStub,
+                          filesLoader: filesLoaderStub,
+                          notesLoader: notesLoaderStub)
+        
+        let result = await sut.load(dealID: "1")
+        
+        XCTAssertEqual(result, .mockFailedDetails)
+    }
+    
+    func test_load_failsWithTasksLoaderError() async {
+        let detailsLoaderStub = DetailsLoaderStub(result: .success(.mock))
+        let tasksLoaderStub = TasksLoaderStub(result: .failure(loaderError()))
+        let contactsLoaderStub = ContactsLoaderStub(result: .success([.mock]))
+        let filesLoaderStub = FilesLoaderStub(result: .success(.mock))
+        let notesLoaderStub = NotesLoaderStub(result: .success([.mock]))
+        
+        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub,
+                          tasksLoader: tasksLoaderStub,
+                          contactsLoader: contactsLoaderStub,
+                          filesLoader: filesLoaderStub,
+                          notesLoader: notesLoaderStub)
+        
+        let result = await sut.load(dealID: "1")
+        
+        XCTAssertEqual(result, .mockFailedTasks)
+    }
+    
+    func test_load_failsWithContactsLoaderError() async {
+        let detailsLoaderStub = DetailsLoaderStub(result: .success(.mock))
+        let tasksLoaderStub = TasksLoaderStub(result: .success([.mock]))
+        let contactsLoaderStub = ContactsLoaderStub(result: .failure(loaderError()))
+        let filesLoaderStub = FilesLoaderStub(result: .success(.mock))
+        let notesLoaderStub = NotesLoaderStub(result: .success([.mock]))
+        
+        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub,
+                          tasksLoader: tasksLoaderStub,
+                          contactsLoader: contactsLoaderStub,
+                          filesLoader: filesLoaderStub,
+                          notesLoader: notesLoaderStub)
+        
+        let result = await sut.load(dealID: "1")
+        
+        XCTAssertEqual(result, .mockFailedContacts)
+    }
+    
+    func test_load_failsWithFilesLoaderError() async {
+        let detailsLoaderStub = DetailsLoaderStub(result: .success(.mock))
+        let tasksLoaderStub = TasksLoaderStub(result: .success([.mock]))
+        let contactsLoaderStub = ContactsLoaderStub(result: .success([.mock]))
+        let filesLoaderStub = FilesLoaderStub(result: .failure(loaderError()))
+        let notesLoaderStub = NotesLoaderStub(result: .success([.mock]))
+        
+        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub,
+                          tasksLoader: tasksLoaderStub,
+                          contactsLoader: contactsLoaderStub,
+                          filesLoader: filesLoaderStub,
+                          notesLoader: notesLoaderStub)
+        
+        let result = await sut.load(dealID: "1")
+        
+        XCTAssertEqual(result, .mockFailedFiles)
+    }
+    
+    func test_load_failsWithNotesLoaderError() async {
+        let detailsLoaderStub = DetailsLoaderStub(result: .success(.mock))
+        let tasksLoaderStub = TasksLoaderStub(result: .success([.mock]))
+        let contactsLoaderStub = ContactsLoaderStub(result: .success([.mock]))
+        let filesLoaderStub = FilesLoaderStub(result: .success(.mock))
+        let notesLoaderStub = NotesLoaderStub(result: .failure(loaderError()))
+        
+        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub,
+                          tasksLoader: tasksLoaderStub,
+                          contactsLoader: contactsLoaderStub,
+                          filesLoader: filesLoaderStub,
+                          notesLoader: notesLoaderStub)
+        
+        let result = await sut.load(dealID: "1")
+        
+        XCTAssertEqual(result, .mockFailedNotes)
     }
     
     // MARK: - Helpers
     
-    private func makeSUT(dealDeailsLoader: AsyncDealDetailsLoader, filesLoader: AsyncFilesLoader) -> DealDetailsAsyncLoaderAdapter {
-        return DealDetailsAsyncLoaderAdapter(dealDeailsLoader: dealDeailsLoader, filesLoader: filesLoader)
+    private func makeSUT(dealDeailsLoader: DealDetailsLoader, 
+                         tasksLoader: TasksLoader,
+                         contactsLoader: ContactsLoader,
+                         filesLoader: FilesLoader,
+                         notesLoader: NotesLoader) -> DealDetailsLoaderAdapter {
+        return DealDetailsLoaderAdapter(dealDeailsLoader: dealDeailsLoader, 
+                                        tasksLoader: tasksLoader,
+                                        contactsLoader: contactsLoader,
+                                        filesLoader: filesLoader,
+                                        notesLoader: notesLoader)
     }
     
-    private class AsyncDetailsLoaderStub: AsyncDealDetailsLoader {
-        
+    private class DetailsLoaderStub: DealDetailsLoader {
         let result: DetailsResult
         
         init(result: DetailsResult) {
@@ -165,8 +138,31 @@ final class DealDetailsLoaderAdapterTests: XCTestCase {
         }
     }
     
-    private class AsyncFilesLoaderStub: AsyncFilesLoader {
+    private class TasksLoaderStub: TasksLoader {
+        let result: TasksResult
         
+        init(result: TasksResult) {
+            self.result = result
+        }
+        
+        func load(dealID: String) async -> TasksResult {
+            return result
+        }
+    }
+    
+    private class ContactsLoaderStub: ContactsLoader {
+        let result: ContactsResult
+        
+        init(result: ContactsResult) {
+            self.result = result
+        }
+        
+        func load(dealID: String) async -> ContactsResult {
+            return result
+        }
+    }
+    
+    private class FilesLoaderStub: FilesLoader {
         let result: FilesResult
         
         init(result: FilesResult) {
@@ -177,87 +173,60 @@ final class DealDetailsLoaderAdapterTests: XCTestCase {
             return result
         }
     }
-}
-
-// MARK: - Helpers
-
-private class LoaderStub: DealDetailsLoader, TasksLoader, ContactsLoader, FilesLoader, NotesLoader {
-    var detailsLoaderError: NSError?
-    var tasksLoaderError: NSError?
-    var contactsLoaderError: NSError?
-    var filesLoaderError: NSError?
-    var notesLoaderError: NSError?
-
-    func load(dealID: String, completion: @escaping (DealDetailsResult) -> Void) {
-        DispatchQueue.global().async {
-            if let error = self.detailsLoaderError {
-                completion(.failure(error))
-            } else {
-                completion(.success(.mock))
-            }
-        }
-    }
     
-    func load(dealID: String, completion: @escaping (TasksResult) -> Void) {
-        DispatchQueue.global().async {
-            if let error = self.tasksLoaderError {
-                completion(.failure(error))
-            } else {
-                completion(.success([.mock]))
-            }
+    private class NotesLoaderStub: NotesLoader {
+        let result: NotesResult
+        
+        init(result: NotesResult) {
+            self.result = result
         }
-    }
-    
-    func load(dealID: String, completion: @escaping (ContactsResult) -> Void) {
-        DispatchQueue.global().async {
-            if let error = self.contactsLoaderError {
-                completion(.failure(error))
-            } else {
-                completion(.success([.mock]))
-            }
-        }
-    }
-    
-    func load(dealID: String, completion: @escaping (FilesResult) -> Void) {
-        DispatchQueue.global().async {
-            if let error = self.filesLoaderError {
-                completion(.failure(error))
-            } else {
-                completion(.success(.mock))
-            }
-        }
-    }
-    
-    func load(dealID: String, completion: @escaping (NotesResult) -> Void) {
-        DispatchQueue.global().async {
-            if let error = self.notesLoaderError {
-                completion(.failure(error))
-            } else {
-                completion(.success([.mock]))
-            }
+        
+        func load(dealID: String) async -> NotesResult {
+            return result
         }
     }
 }
+
+// MARK: - Mocks
 
 extension DealDetailsModel {
-    static let mock = DealDetailsModel(dealDetails: .mock,
-                                       tasks: [.mock],
-                                       contacts: [.mock],
-                                       files: .mock,
-                                       notes: [.mock])
+    static let mockSuccess = DealDetailsModel(dealDetails: .success(.mock),
+                                              tasks: .success([.mock]),
+                                              contacts: .success([.mock]),
+                                              files: .success(.mock),
+                                              notes: .success([.mock]))
+    
+    static let mockFailedDetails = DealDetailsModel(dealDetails: .failure(loaderError()),
+                                                    tasks: .success([.mock]),
+                                                    contacts: .success([.mock]),
+                                                    files: .success(.mock),
+                                                    notes: .success([.mock]))
+    
+    static let mockFailedTasks = DealDetailsModel(dealDetails: .success(.mock),
+                                                  tasks: .failure(loaderError()),
+                                                  contacts: .success([.mock]),
+                                                  files: .success(.mock),
+                                                  notes: .success([.mock]))
+    
+    static let mockFailedContacts = DealDetailsModel(dealDetails: .success(.mock),
+                                                     tasks: .success([.mock]),
+                                                     contacts: .failure(loaderError()),
+                                                     files: .success(.mock),
+                                                     notes: .success([.mock]))
+    
+    static let mockFailedFiles = DealDetailsModel(dealDetails: .success(.mock),
+                                                     tasks: .success([.mock]),
+                                                     contacts: .success([.mock]),
+                                                     files: .failure(loaderError()),
+                                                     notes: .success([.mock]))
+    
+    static let mockFailedNotes = DealDetailsModel(dealDetails: .success(.mock),
+                                                     tasks: .success([.mock]),
+                                                     contacts: .success([.mock]),
+                                                     files: .success(.mock),
+                                                     notes: .failure(loaderError()))
 }
 
-private extension Result {
-    var error: Failure? {
-        switch self {
-        case let .failure(error):
-            return error
-        case .success:
-            return nil
-        }
-    }
-}
-
-extension BasicDealDetailsModel {
-    static let mock = BasicDealDetailsModel(dealDetails: .mock, files: .mock)
+private func loaderError() -> LoaderError {
+    .failure
 }
