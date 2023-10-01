@@ -127,6 +127,56 @@ final class DealDetailsLoaderAdapterTests: XCTestCase {
         
         XCTAssertEqual(result?.error as? NSError, loader.notesLoaderError)
     }
+    
+    // MARK: - Async Tests
+    
+    func test_asyncLoad_producesCombinedSuccessfulLoaderResults() async {
+        let detailsLoaderStub = AsyncDetailsLoaderStub(result: .success(.mock))
+        let error = NSError(domain: "any", code: 0)
+        let filesLoaderStub = AsyncFilesLoaderStub(result: .success(.mock))
+        let sut = makeSUT(dealDeailsLoader: detailsLoaderStub, filesLoader: filesLoaderStub)
+        
+        let result = await sut.load(dealID: "1")
+        
+        switch result {
+        case .success(let value):
+            XCTAssertEqual(value, .mock)
+        case .failure(let error):
+            XCTFail("Expected success but received \(error)")
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    private func makeSUT(dealDeailsLoader: AsyncDealDetailsLoader, filesLoader: AsyncFilesLoader) -> DealDetailsAsyncLoaderAdapter {
+        return DealDetailsAsyncLoaderAdapter(dealDeailsLoader: dealDeailsLoader, filesLoader: filesLoader)
+    }
+    
+    private class AsyncDetailsLoaderStub: AsyncDealDetailsLoader {
+        
+        let result: DetailsResult
+        
+        init(result: DetailsResult) {
+            self.result = result
+        }
+        
+        func load(dealID: String) async -> DetailsResult {
+            return result
+        }
+    }
+    
+    private class AsyncFilesLoaderStub: AsyncFilesLoader {
+        
+        let result: FilesResult
+        
+        init(result: FilesResult) {
+            self.result = result
+        }
+        
+        func load(dealID: String) async -> FilesResult {
+            return result
+        }
+    }
 }
 
 // MARK: - Helpers
@@ -206,4 +256,8 @@ private extension Result {
             return nil
         }
     }
+}
+
+extension BasicDealDetailsModel {
+    static let mock = BasicDealDetailsModel(dealDetails: .mock, files: .mock)
 }

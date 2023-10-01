@@ -1,3 +1,15 @@
 import Foundation
 
-struct Files: Equatable {}
+struct Files: Equatable {
+    let files: [File]
+    let meta: Meta
+    
+    struct File: Equatable {
+        let id: String
+        let name: String
+    }
+    
+    struct Meta: Equatable {
+        let limit: Int
+    }
+}

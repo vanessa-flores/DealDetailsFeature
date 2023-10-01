@@ -122,3 +122,26 @@ private extension DealDetailsLoaderAdapter {
         }
     }
 }
+
+class DealDetailsAsyncLoaderAdapter: AsyncDealDetailsViewLoader {
+    
+    let dealDeailsLoader: AsyncDealDetailsLoader
+    let filesLoader: AsyncFilesLoader
+    
+    init(dealDeailsLoader: AsyncDealDetailsLoader, filesLoader: AsyncFilesLoader) {
+        self.dealDeailsLoader = dealDeailsLoader
+        self.filesLoader = filesLoader
+    }
+    
+    func load(dealID: String) async -> LoaderResult {
+        do {
+            let details = await dealDeailsLoader.load(dealID: dealID)
+            let files = await filesLoader.load(dealID: dealID)
+            
+            return .success(BasicDealDetailsModel(dealDetails: try details.get(), files: try files.get()))
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+}

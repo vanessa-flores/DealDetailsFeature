@@ -1,3 +1,6 @@
 import Foundation
 
-struct DealDetails: Equatable {}
+struct DealDetails: Equatable {
+    let id: String
+    let name: String
+}
