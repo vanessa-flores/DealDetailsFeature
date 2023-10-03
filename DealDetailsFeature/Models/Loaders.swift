@@ -1,17 +1,5 @@
 import Foundation
 
-struct DealDetailsModel: Equatable {
-    let dealDetails: DealDetailsLoader.DetailsResult
-    let tasks: TasksLoader.TasksResult
-    let contacts: ContactsLoader.ContactsResult
-    let files: FilesLoader.FilesResult
-    let notes: NotesLoader.NotesResult
-}
-
-protocol DealDetailsViewLoader {    
-    func load(dealID: String) async -> DealDetailsModel
-}
-
 protocol DealDetailsLoader {
     typealias DetailsResult = Result<DealDetails, LoaderError>
     

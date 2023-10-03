@@ -20,7 +20,7 @@
 		A3532A912AC879C400ABB174 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3532A902AC879C400ABB174 /* Contact.swift */; };
 		A3532A932AC879D500ABB174 /* Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3532A922AC879D500ABB174 /* Files.swift */; };
 		A3532A952AC879EA00ABB174 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3532A942AC879EA00ABB174 /* Note.swift */; };
-		A3C0ACD52AC8A77A0073342B /* DealDetailsViewLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */; };
+		A3C0ACD52AC8A77A0073342B /* Loaders.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACD42AC8A77A0073342B /* Loaders.swift */; };
 		A3C0ACD82AC8B5090073342B /* DealDetailsLoaderAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACD72AC8B5090073342B /* DealDetailsLoaderAdapter.swift */; };
 		A3C0ACDB2AC8B58A0073342B /* SharedMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACDA2AC8B58A0073342B /* SharedMocks.swift */; };
 		A3C0ACDD2AC91ED30073342B /* DealDetailsLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACDC2AC91ED30073342B /* DealDetailsLoaderTests.swift */; };
@@ -60,7 +60,7 @@
 		A3532A902AC879C400ABB174 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		A3532A922AC879D500ABB174 /* Files.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Files.swift; sourceTree = "<group>"; };
 		A3532A942AC879EA00ABB174 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
-		A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DealDetailsViewLoader.swift; path = DealDetailsFeature/Models/DealDetailsViewLoader.swift; sourceTree = SOURCE_ROOT; };
+		A3C0ACD42AC8A77A0073342B /* Loaders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Loaders.swift; path = DealDetailsFeature/Models/Loaders.swift; sourceTree = SOURCE_ROOT; };
 		A3C0ACD72AC8B5090073342B /* DealDetailsLoaderAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealDetailsLoaderAdapter.swift; sourceTree = "<group>"; };
 		A3C0ACDA2AC8B58A0073342B /* SharedMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedMocks.swift; sourceTree = "<group>"; };
 		A3C0ACDC2AC91ED30073342B /* DealDetailsLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealDetailsLoaderTests.swift; sourceTree = "<group>"; };
@@ -167,7 +167,7 @@
 		A3C0ACD32AC8A7630073342B /* Deal Details */ = {
 			isa = PBXGroup;
 			children = (
-				A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */,
+				A3C0ACD42AC8A77A0073342B /* Loaders.swift */,
 				A3C0ACD72AC8B5090073342B /* DealDetailsLoaderAdapter.swift */,
 			);
 			path = "Deal Details";
@@ -316,7 +316,7 @@
 				A3532A952AC879EA00ABB174 /* Note.swift in Sources */,
 				A3532A912AC879C400ABB174 /* Contact.swift in Sources */,
 				A3C0ACD82AC8B5090073342B /* DealDetailsLoaderAdapter.swift in Sources */,
-				A3C0ACD52AC8A77A0073342B /* DealDetailsViewLoader.swift in Sources */,
+				A3C0ACD52AC8A77A0073342B /* Loaders.swift in Sources */,
 				A3532A622AC86BB600ABB174 /* ContentView.swift in Sources */,
 				A3532A602AC86BB600ABB174 /* DealDetailsFeatureApp.swift in Sources */,
 				A3532A932AC879D500ABB174 /* Files.swift in Sources */,
