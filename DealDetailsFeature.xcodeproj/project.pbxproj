@@ -23,6 +23,7 @@
 		A3C0ACD52AC8A77A0073342B /* DealDetailsViewLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */; };
 		A3C0ACD82AC8B5090073342B /* DealDetailsLoaderAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACD72AC8B5090073342B /* DealDetailsLoaderAdapter.swift */; };
 		A3C0ACDB2AC8B58A0073342B /* SharedMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACDA2AC8B58A0073342B /* SharedMocks.swift */; };
+		A3C0ACDD2AC91ED30073342B /* DealDetailsLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C0ACDC2AC91ED30073342B /* DealDetailsLoaderTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 		A3C0ACD42AC8A77A0073342B /* DealDetailsViewLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DealDetailsViewLoader.swift; path = DealDetailsFeature/Models/DealDetailsViewLoader.swift; sourceTree = SOURCE_ROOT; };
 		A3C0ACD72AC8B5090073342B /* DealDetailsLoaderAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealDetailsLoaderAdapter.swift; sourceTree = "<group>"; };
 		A3C0ACDA2AC8B58A0073342B /* SharedMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedMocks.swift; sourceTree = "<group>"; };
+		A3C0ACDC2AC91ED30073342B /* DealDetailsLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealDetailsLoaderTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +138,7 @@
 				A3C0ACD92AC8B5730073342B /* Shared Mocks */,
 				A3532A702AC86BB700ABB174 /* DealDetailsFeatureTests.swift */,
 				A3532A892AC8784B00ABB174 /* DealDetailsLoaderAdapterTests.swift */,
+				A3C0ACDC2AC91ED30073342B /* DealDetailsLoaderTests.swift */,
 			);
 			path = DealDetailsFeatureTests;
 			sourceTree = "<group>";
@@ -324,6 +327,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A3C0ACDD2AC91ED30073342B /* DealDetailsLoaderTests.swift in Sources */,
 				A3532A712AC86BB700ABB174 /* DealDetailsFeatureTests.swift in Sources */,
 				A3532A8A2AC8784B00ABB174 /* DealDetailsLoaderAdapterTests.swift in Sources */,
 				A3C0ACDB2AC8B58A0073342B /* SharedMocks.swift in Sources */,

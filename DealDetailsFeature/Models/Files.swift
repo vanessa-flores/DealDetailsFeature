@@ -10,6 +10,7 @@ struct Files: Equatable {
     }
     
     struct Meta: Equatable {
-        let limit: Int
+        let storageLimit: Int
+        let currentStorageUsage: Int
     }
 }

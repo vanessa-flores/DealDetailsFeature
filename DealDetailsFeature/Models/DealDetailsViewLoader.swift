@@ -43,6 +43,5 @@ protocol NotesLoader {
 }
 
 enum LoaderError: Error, Equatable {
-    case success
-    case failure
+    case unloadable
 }

@@ -1,3 +1,7 @@
 import Foundation
 
-struct Contact: Equatable {}
+struct Contact: Equatable {
+    let id: String
+    let name: String
+    let email: String
+}

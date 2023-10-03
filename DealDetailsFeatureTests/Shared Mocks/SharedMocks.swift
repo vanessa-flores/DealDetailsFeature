@@ -7,11 +7,11 @@ extension DealDetails {
 }
 
 extension Task {
-    static let mock = Task()
+    static let mock = Task(id: "1", name: "Task 1")
 }
 
 extension Contact {
-    static let mock = Contact()
+    static let mock = Contact(id: "1", name: "First Last", email: "any@email.com")
 }
 
 extension Files {
@@ -23,9 +23,9 @@ extension Files.File {
 }
 
 extension Files.Meta {
-    static let mock = Files.Meta(limit: 1024)
+    static let mock = Files.Meta(storageLimit: 10000, currentStorageUsage: 1024)
 }
 
 extension Note {
-    static let mock = Note()
+    static let mock = Note(id: "1", description: "Note description")
 }

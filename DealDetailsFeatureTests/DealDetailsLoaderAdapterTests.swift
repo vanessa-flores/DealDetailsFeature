@@ -228,5 +228,5 @@ extension DealDetailsModel {
 }
 
 private func loaderError() -> LoaderError {
-    .failure
+    .unloadable
 }

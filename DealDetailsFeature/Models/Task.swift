@@ -1,3 +1,6 @@
 import Foundation
 
-struct Task: Equatable {}
+struct Task: Equatable {
+    let id: String
+    let name: String
+}
