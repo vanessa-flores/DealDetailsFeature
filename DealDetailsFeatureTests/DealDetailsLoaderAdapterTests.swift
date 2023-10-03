@@ -4,7 +4,7 @@ import XCTest
 
 final class DealDetailsLoaderAdapterTests: XCTestCase {
 
-    func test_Load_producesCombinedSuccessfulLoaderResults() async {
+    func test_load_producesCombinedSuccessfulLoaderResults() async {
         let detailsLoaderStub = DetailsLoaderStub(result: .success(.mock))
         let tasksLoaderStub = TasksLoaderStub(result: .success([.mock]))
         let contactsLoaderStub = ContactsLoaderStub(result: .success([.mock]))

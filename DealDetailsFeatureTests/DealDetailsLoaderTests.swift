@@ -30,7 +30,7 @@ protocol HTTPClient {
 
 final class DealDetailsLoaderTests: XCTestCase {
 
-    func test() async {
+    func test_load_producesSuccessfulLoaderResult() async {
         let validResponse = (Data(), httpResponse(code: 200))
         let expectedResult: Result<DealDetails, LoaderError> = .success(DealDetails(id: "1", name: "Deal 1"))
         
